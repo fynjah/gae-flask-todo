@@ -11,9 +11,6 @@
         this.build = function() {
             var _this = this,
                 html = _this.renderItems(_this.listItems(), $('.todo-list'));
-
-
-            $('.todo-list').html(html);
         }
 
         function Storage() {
@@ -90,15 +87,8 @@
 	            container.html(html);
         	})
         }
-        this.getItemIndex = function(id) {
-            var items = this.listItems();
-            return _.findIndex(items, {
-                'id': id
-            });
-        }
         this.getItem = function(id) {
-            var items = this.listItems();
-            return items[this.getItemIndex(id)];
+
         }
         this.checkItem = function(id, check) {
             this.updateItem(id, {
@@ -106,20 +96,10 @@
             })
         }
         this.deleteItem = function(id) {
-            var items = this.listItems(),
-                index = this.getItemIndex(id);
 
-            if (index > -1) {
-                items.splice(index, 1)
-            }
-            this.storage.update(items);
         }
         this.updateItem = function(id, options) {
-            options || (options = {});
-            var items = this.listItems(),
-                index = this.getItemIndex(id);
-            _.assign(items[index], options)
-            this.storage.update(items);
+        	
         }
         this.listItems = function() {
             return this.storage.get();
