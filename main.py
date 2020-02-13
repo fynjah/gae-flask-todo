@@ -24,7 +24,7 @@ def root():
     todo = Todo(title="Lorem ipsum dolor sit amet, consectetur adipiscing.")
 
     with client.context():
-        todo.put()
+        #todo.put()
         todos = Todo.query().order('-timestamp').fetch()
 
     return render_template('index.html', times=todos)

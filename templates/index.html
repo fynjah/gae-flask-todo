@@ -1,15 +1,25 @@
 <!doctype html>
 <html>
-<head>
-  <title>ToDo list</title>
-  <script src="{{ url_for('static', filename='script.js') }}"></script>
-  <link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-</head>
-<body>
+	<head>
+		<title>ToDo list</title>
+		<link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='normalize.css') }}">
+		<link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+	</head>
+	<body>
 
-  {% for time in times %}    
-  	<p>{{ time.timestamp }}</p>
-  	<p>{{ time.desc }}</p>
-  {% endfor %}
-</body>
+		<div class="todo-container">
+			<header class="todo-header"><h1>Todo List:</h1></header>
+			<ul class="todo-list">
+				
+			</ul>
+		</div>
+
+		<script src="{{ url_for('static', filename='lodash.js') }}"></script>
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+		<script src="{{ url_for('static', filename='script.js') }}"></script>
+		<script type="text/javascript">
+			this.Todo = new Todo();
+			this.Todo.build();
+		</script>
+	</body>
 </html>
