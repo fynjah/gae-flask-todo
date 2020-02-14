@@ -24,15 +24,18 @@
 				    });
 				    return $deferred;
                 },
-                create: function(items) {
+                create: function(title) {
 				    var $deferred = $.ajax({
 				        type: "POST",
 				        url: '/json',
+				        data:{
+				        	title:title
+				        },
 				        dataType: 'json'
 				    });
 				    return $deferred;
                 },
-                update: function(items) {
+                update: function(item) {
 				    var $deferred = $.ajax({
 				        type: "PUT",
 				        url: '/json',
@@ -53,12 +56,11 @@
 
         this.storage = new Storage();
 
-        this.addItem = function(title, status) {
+        this.addItem = function(title) {
             var _this = this,
             	title = title.trim(),
                 item = new Item({
-                    'title': title,
-                    'status': status
+                    'title': title
                 });
             if(!item.title){
                 return;
@@ -99,7 +101,7 @@
 
         }
         this.updateItem = function(id, options) {
-        	
+
         }
         this.listItems = function() {
             return this.storage.get();
