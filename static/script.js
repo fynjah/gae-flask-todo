@@ -35,10 +35,11 @@
 				    });
 				    return $deferred;
                 },
-                update: function(item) {
+                update: function(id, data) {
 				    var $deferred = $.ajax({
 				        type: "PUT",
-				        url: '/api/v1/todos/'+item.id,
+				        url: '/api/v1/todos/'+id,
+				        data:data,
 				        dataType: 'json'
 				    });
 				    return $deferred;
@@ -65,18 +66,20 @@
             if(!item.title){
                 return;
             }
-            this.storage.create(item).success(function(data){
+            return this.storage.create(item).success(function(data){
             	_this.build();
             });
             
         }
 
         function _renderItem(item) {
-            var completed = (item.checked) ? 'complete' : "";
-            return '<li class="todo-item ' + completed + '" title="'+item.timestamp+'">\
-            	<span class="checkbox"><input data-id="' + item.id + '" type="checkbox" /></span>\
-            	<span class="title">'+_.escape(item.title)+'</span>\
-            	<span class="btn"><button class="close" data-dismiss="alert">×</button></span>\
+            var completed = (item.checked) ? 'completed' : '',
+            	checked = item.checked ? 'checked' : '';
+            return '<li class="todo-item" title="'+item.timestamp+'">\
+            	<span class="checkbox">\
+            	<input class="todo-checkbox" data-id="' + item.id + '" type="checkbox" '+checked+' /></span>\
+            	<span class="title ' + completed + '">'+_.escape(item.title)+'</span>\
+            	<span class="btn todo-delete" data-id="'+item.id+'"><button>×</button></span>\
             </li>';
         }
         this.renderItems = function(items, container) {
@@ -88,19 +91,22 @@
 	            container.html(html);
         	})
         }
-        this.getItem = function(id) {
-
-        }
         this.checkItem = function(id, check) {
-            this.updateItem(id, {
-                'checked': Boolean(check)
+            return this.updateItem(id, {
+                'checked': + check
             })
         }
         this.deleteItem = function(id) {
-
+        	var _this = this;
+            return this.storage.delete(id).success(function(data){
+            	_this.build();
+            });
         }
         this.updateItem = function(id, options) {
-
+        	var _this = this;
+            return this.storage.update(id, options).success(function(data){
+            	_this.build();
+            });
         }
         this.listItems = function() {
             return this.storage.get();

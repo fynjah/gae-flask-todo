@@ -68,12 +68,19 @@ def api_todos():
 
 @app.route('/api/v1/todos/<int:todo_id>', methods=['PUT', 'DELETE'])
 def api_todo_detail(todo_id):
+    if not 'userid' in session:
+        return 'Error not userid'
+    userid = session['userid']
     with client.context():
-        todo = Todo.query()
-        todo = todo.add_filter("key", '=', todo_id).fetch()
+        todo = Todo.get_by_id(todo_id)
+        if not todo.userid == userid:
+            return '404'
         if request.method == 'PUT':
+            todo.checked = bool(request.values.get('checked', False))
+            todo.put()
             return jsonify(serialize_todo(todo))
         if request.method == 'DELETE':
+            todo.key.delete()
             return '204'
 
 

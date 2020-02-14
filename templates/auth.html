@@ -30,8 +30,8 @@
 				    });
 			}
 			function init(){
-				this.Todo = new Todo();
-				this.Todo.build();
+				this.todo = new Todo();
+				this.todo.build();
 				$(document).ready(function(){
 					$(document).on('click', '.todo-link-add', function(e){
 						e.preventDefault();
@@ -47,7 +47,18 @@
 					$(document).on('click', '.todo-save', function(e){
 						e.preventDefault();
 						var value = $('.todo-input-add').val().trim();
-						Todo.addItem(value);
+						todo.addItem(value);
+					});
+					$(document).on('click', '.todo-delete', function(e){
+						e.preventDefault();
+						var id = $(this).data('id');
+						todo.deleteItem(id);
+					});
+					$(document).on('change', '.todo-checkbox', function(e){
+						e.preventDefault();
+						var id = $(this).data('id'),
+							checked = $(this).is(':checked');
+						todo.checkItem(id, checked);
 					});
 				});
 			}

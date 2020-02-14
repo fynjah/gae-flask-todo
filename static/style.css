@@ -31,6 +31,9 @@ body {
 	line-height: 30px;
 	margin-bottom: 5px;
 }
+.todo-list .todo-item .completed{
+	text-decoration: line-through;
+}
 .todo-list .todo-item > span {
 	display: inline-block;
 	vertical-align: middle;	
