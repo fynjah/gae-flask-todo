@@ -19,17 +19,17 @@
                 get: function() {
 				    var $deferred = $.ajax({
 				        type: "GET",
-				        url: '/json',
+				        url: '/api/v1/todos',
 				        dataType: 'json'
 				    });
 				    return $deferred;
                 },
-                create: function(title) {
+                create: function(item) {
 				    var $deferred = $.ajax({
 				        type: "POST",
-				        url: '/json',
+				        url: '/api/v1/todos',
 				        data:{
-				        	title:title
+				        	"title":item.title
 				        },
 				        dataType: 'json'
 				    });
@@ -38,7 +38,7 @@
                 update: function(item) {
 				    var $deferred = $.ajax({
 				        type: "PUT",
-				        url: '/json',
+				        url: '/api/v1/todos/'+item.id,
 				        dataType: 'json'
 				    });
 				    return $deferred;
@@ -46,7 +46,7 @@
                 delete: function(id) {
 				    var $deferred = $.ajax({
 				        type: "DELETE",
-				        url: '/json',
+				        url: '/api/v1/todos/'+id,
 				        dataType: 'json'
 				    });
 				    return $deferred;

@@ -9,15 +9,18 @@ from models import Todo
 app = Flask(__name__)
 app.secret_key = os.environ.get('TODO_SECRET_KEY', None)
 CLIENT_ID = os.environ.get('TODO_CLIENT_ID')
-print(CLIENT_ID)
-print(app.secret_key)
 
 
 client = ndb.Client()
 
 
+def serialize_todo(todo):
+    # I know, som
+    return dict(todo.to_dict(), **dict(id=todo.key.id()))
+
+
 def serialize_todos(todos=[]):
-    return [dict(t.to_dict(), **dict(id=t.key.id())) for t in todos]
+    return [serialize_todo(t) for t in todos]
 
 
 @app.route('/')
@@ -27,12 +30,10 @@ def root():
 
 @app.route('/auth')
 def auth():
-
     token = request.args.get('token')
-
     try:
         idinfo = id_token.verify_oauth2_token(
-            token, 
+            token,
             requests.Request(),
             CLIENT_ID)
 
@@ -47,11 +48,35 @@ def auth():
     except ValueError:
         return 'Error'
 
-@app.route('/json')
-def json():
+
+@app.route('/api/v1/todos', methods=['POST', 'GET'])
+def api_todos():
+    if not 'userid' in session:
+        return 'Error not userid'
     with client.context():
-        todos = Todo.query().order('-timestamp').fetch()
+        if request.method == 'POST':
+            title = request.values.get('title', None)
+            if not title:
+                return 'Error title'
+            todo = Todo(title=request.values.get('title'),
+                        userid=session['userid'])
+            todo.put()
+        todos = Todo.query().filter(Todo.userid == session['userid'])
+        todos = todos.fetch()
     return jsonify(serialize_todos(todos))
+
+
+@app.route('/api/v1/todos/<int:todo_id>', methods=['PUT', 'DELETE'])
+def api_todo_detail(todo_id):
+    with client.context():
+        todo = Todo.query()
+        todo = todo.add_filter("key", '=', todo_id).fetch()
+        if request.method == 'PUT':
+            return jsonify(serialize_todo(todo))
+        if request.method == 'DELETE':
+            return '204'
+
 
 if __name__ == '__main__':
     app.run(host='127.0.0.1', port=8080, debug=True)
+
