@@ -37,23 +37,40 @@
 						e.preventDefault();
 						$(this).hide();
 						$('.todo-form-add').show();
+						$('.todo-input-add').val('');
 					});
+
+					$(document).on('keypress', '.todo-input-add', function(e){
+		                if (e.charCode === 13) {
+		                	e.preventDefault();
+		                    todo.addItem($(this).val()).success(function(){
+		                    	$('.todo-input-add').val('');	
+		                    });
+		                    
+		                }
+					});
+
 					$(document).on('click', '.todo-cancel', function(e){
 						e.preventDefault();
 						$('.todo-link-add').show();
 						$('.todo-form-add').hide();
 						$('.todo-input-add').val('');
 					});
+
 					$(document).on('click', '.todo-save', function(e){
 						e.preventDefault();
-						var value = $('.todo-input-add').val().trim();
-						todo.addItem(value);
+						var value = $('.todo-input-add').val();
+						todo.addItem(value).success(function(){
+		                    	$('.todo-input-add').val('');	
+		                    });;
 					});
+
 					$(document).on('click', '.todo-delete', function(e){
 						e.preventDefault();
 						var id = $(this).data('id');
 						todo.deleteItem(id);
 					});
+
 					$(document).on('change', '.todo-checkbox', function(e){
 						e.preventDefault();
 						var id = $(this).data('id'),
