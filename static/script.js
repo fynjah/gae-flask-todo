@@ -73,7 +73,6 @@
 
         function _renderItem(item) {
             var completed = (item.checked) ? 'complete' : "";
-            console.log(item)
             return '<li class="todo-item ' + completed + '" title="'+item.timestamp+'">\
             	<span class="checkbox"><input data-id="' + item.id + '" type="checkbox" /></span>\
             	<span class="title">'+_.escape(item.title)+'</span>\

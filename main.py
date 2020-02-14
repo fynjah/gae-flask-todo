@@ -1,10 +1,17 @@
-import datetime
-
-from flask import Flask, render_template, jsonify
-
+import os
+from flask import Flask, render_template, jsonify, session, request
 from google.cloud import ndb
+from google.oauth2 import id_token
+from google.auth.transport import requests
+from models import Todo
+
 
 app = Flask(__name__)
+app.secret_key = os.environ.get('TODO_SECRET_KEY', None)
+CLIENT_ID = os.environ.get('TODO_CLIENT_ID')
+print(CLIENT_ID)
+print(app.secret_key)
+
 
 client = ndb.Client()
 
@@ -13,22 +20,32 @@ def serialize_todos(todos=[]):
     return [dict(t.to_dict(), **dict(id=t.key.id())) for t in todos]
 
 
-class Todo(ndb.Model):
-    title = ndb.StringProperty()
-    timestamp = ndb.DateTimeProperty(auto_now_add=True)
-    checked = ndb.BooleanProperty(default=False)
-
-
 @app.route('/')
 def root():
-    todo = Todo(title="Lorem ipsum dolor sit amet, consectetur adipiscing.")
+    return render_template('auth.html', CLIENT_ID=CLIENT_ID)
 
-    with client.context():
-        #todo.put()
-        todos = Todo.query().order('-timestamp').fetch()
 
-    return render_template('index.html', times=todos)
+@app.route('/auth')
+def auth():
 
+    token = request.args.get('token')
+
+    try:
+        idinfo = id_token.verify_oauth2_token(
+            token, 
+            requests.Request(),
+            CLIENT_ID)
+
+        if idinfo['iss'] not in ['accounts.google.com', 'https://accounts.google.com']:
+            raise ValueError('Wrong issuer.')
+
+        # ID token is valid.
+        # Get the user's Google Account ID from the decoded token.
+        userid = idinfo['sub']
+        session['userid'] = userid
+        return render_template('index.html')
+    except ValueError:
+        return 'Error'
 
 @app.route('/json')
 def json():
