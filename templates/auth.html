@@ -33,14 +33,14 @@
 				this.todo = new Todo();
 				this.todo.build();
 				$(document).ready(function(){
-					$(document).on('click', '.todo-link-add', function(e){
+					$(document).off('click', '.todo-link-add').on('click', '.todo-link-add', function(e){
 						e.preventDefault();
 						$(this).hide();
 						$('.todo-form-add').show();
 						$('.todo-input-add').val('');
 					});
 
-					$(document).on('keypress', '.todo-input-add', function(e){
+					$(document).off('keypress', '.todo-input-add').on('keypress', '.todo-input-add', function(e){
 		                if (e.charCode === 13) {
 		                	e.preventDefault();
 		                    todo.addItem($(this).val()).success(function(){
@@ -50,14 +50,14 @@
 		                }
 					});
 
-					$(document).on('click', '.todo-cancel', function(e){
+					$(document).off('click', '.todo-cancel').on('click', '.todo-cancel', function(e){
 						e.preventDefault();
 						$('.todo-link-add').show();
 						$('.todo-form-add').hide();
 						$('.todo-input-add').val('');
 					});
 
-					$(document).on('click', '.todo-save', function(e){
+					$(document).off('click', '.todo-save').on('click', '.todo-save', function(e){
 						e.preventDefault();
 						var value = $('.todo-input-add').val();
 						todo.addItem(value).success(function(){
@@ -65,13 +65,13 @@
 		                    });;
 					});
 
-					$(document).on('click', '.todo-delete', function(e){
+					$(document).off('click', '.todo-delete').on('click', '.todo-delete', function(e){
 						e.preventDefault();
 						var id = $(this).data('id');
 						todo.deleteItem(id);
 					});
 
-					$(document).on('change', '.todo-checkbox', function(e){
+					$(document).off('change', '.todo-checkbox').on('change', '.todo-checkbox', function(e){
 						e.preventDefault();
 						var id = $(this).data('id'),
 							checked = $(this).is(':checked');
