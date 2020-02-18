@@ -8,6 +8,7 @@ from models import Todo
 
 
 app = Flask(__name__)
+# Gets sensible data from .env
 app.secret_key = os.environ.get('TODO_SECRET_KEY', None)
 CLIENT_ID = os.environ.get('TODO_CLIENT_ID')
 
@@ -16,14 +17,24 @@ client = ndb.Client()
 
 
 def serialize_todo(todo):
+    '''
+    Simple function to add object id to dict from model.
+    '''
     return dict(todo.to_dict(), **dict(id=todo.key.id()))
 
 
 def serialize_todos(todos=[]):
+    '''
+    Do same as abobe, but in list generator.
+    '''
     return [serialize_todo(t) for t in todos]
 
 
 def login_required(f):
+    '''
+    Decorator to check userid in session. 
+    userid can be present in session only if user is authorized.
+    '''
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if not 'userid' in session:
@@ -34,11 +45,18 @@ def login_required(f):
 
 @app.route('/')
 def root():
+    '''
+    Simply returns rendered html with sign-in button.
+    '''
     return render_template('auth.html', CLIENT_ID=CLIENT_ID)
 
 
 @app.route('/auth')
 def auth():
+    '''
+    Authorization view. Reveives token and checks it at google.
+    If ok - google returs userinfo and wee add userid in session.
+    '''
     token = request.args.get('token')
     try:
         idinfo = id_token.verify_oauth2_token(
@@ -53,6 +71,7 @@ def auth():
         # Get the user's Google Account ID from the decoded token.
         userid = idinfo['sub']
         session['userid'] = userid
+        # Returns body of app.
         return render_template('index.html')
     except ValueError:
         return jsonify({"error": "Token is not valid."}), 400
@@ -61,16 +80,22 @@ def auth():
 @app.route('/api/v1/todos', methods=['POST', 'GET'])
 @login_required
 def api_todos():
+    '''
+    An endpoint to create and receive todos.
+    '''
     status_code = 200
     with client.context():
         if request.method == 'POST':
             title = request.values.get('title', None)
             if not title:
-                return 'Error title'
+                return jsonify({'error': "Field \'title\' is empty."})
             todo = Todo(title=request.values.get('title'),
                         userid=session['userid'])
             todo.put()
             status_code = 201
+            # Yeah, we could return here newly created object,
+            # but I decided to return the whole list.
+            # return jsonify(serialize_todo(todo))
         todos = Todo.query().filter(Todo.userid == session['userid'])
         todos = todos.fetch()
     return jsonify(serialize_todos(todos)), status_code
@@ -79,6 +104,10 @@ def api_todos():
 @app.route('/api/v1/todos/<int:todo_id>', methods=['PUT', 'DELETE'])
 @login_required
 def api_todo_detail(todo_id):
+    '''
+    An endpoint to update todo and also to delete.
+    Checks permission for update.
+    '''
     userid = session['userid']
     with client.context():
         todo = Todo.get_by_id(todo_id)
