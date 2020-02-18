@@ -1,6 +1,6 @@
 import os
 from functools import wraps
-from flask import Flask, render_template, jsonify, session, request, abort
+from flask import Flask, render_template, jsonify, session, request, abort, make_response
 from google.cloud import ndb
 from google.oauth2 import id_token
 from google.auth.transport import requests
@@ -27,7 +27,7 @@ def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if not 'userid' in session:
-            abort(400)
+            abort(make_response(jsonify({"error": "You are not authorized."}), 401))
         return f(*args, **kwargs)
     return decorated_function
 
