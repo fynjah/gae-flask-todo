@@ -52,3 +52,6 @@ body {
 .todo-list .todo-item > span.btn {
 	float:right;
 }
+.todo-signout {
+	margin-left: 10px;
+}
