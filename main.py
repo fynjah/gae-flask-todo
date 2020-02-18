@@ -83,14 +83,14 @@ def api_todo_detail(todo_id):
     with client.context():
         todo = Todo.get_by_id(todo_id)
         if not todo.userid == userid:
-            return {"error": "Todo does not exist."}
+            return {"error": "Todo does not exist."}, 400
         if request.method == 'PUT':
             todo.checked = bool(request.values.get('checked', False))
             todo.put()
             return jsonify(serialize_todo(todo))
         if request.method == 'DELETE':
             todo.key.delete()
-            return None, 204
+            return '', 204
 
 
 if __name__ == '__main__':
