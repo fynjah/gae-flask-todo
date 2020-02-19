@@ -1,0 +1,101 @@
+<!doctype html>
+<html>
+	<head>
+		<title>ToDo list</title>
+		<link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='normalize.css') }}">
+		<link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+	    <meta name="google-signin-scope" content="profile email">
+	    <meta name="google-signin-client_id" content="{{CLIENT_ID}}">
+		<script src="{{ url_for('static', filename='lodash.js') }}"></script>
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+		<script src="{{ url_for('static', filename='script.js') }}"></script>
+		<script src="https://apis.google.com/js/platform.js" async defer></script>
+
+		<script type="text/javascript">
+			 function onSignIn(googleUser) {
+				var id_token = googleUser.getAuthResponse().id_token;
+				    var $deferred = $.ajax({
+				        type: "GET",
+				        url: '/auth',
+				        data:{
+				        	token:id_token
+				        },
+				        dataType: 'html',
+				        success:function(data){
+				        	$(".todo-container").html(data);
+				        	init();
+				        	$('.todo-signout').show();
+				        	$('body').addClass('initialized');
+				        }
+				    });
+			}
+			function init(){
+				this.todo = new Todo();
+				this.todo.build();
+				$(document).ready(function(){
+					$(document).off('click', '.todo-link-add').on('click', '.todo-link-add', function(e){
+						e.preventDefault();
+						$(this).hide();
+						$('.todo-form-add').show();
+						$('.todo-input-add').val('');
+					});
+
+					$(document).off('keypress', '.todo-input-add').on('keypress', '.todo-input-add', function(e){
+		                if (e.charCode === 13) {
+		                	e.preventDefault();
+		                    todo.addItem($(this).val()).success(function(){
+		                    	$('.todo-input-add').val('');	
+		                    });
+		                    
+		                }
+					});
+
+					$(document).off('click', '.todo-cancel').on('click', '.todo-cancel', function(e){
+						e.preventDefault();
+						$('.todo-link-add').show();
+						$('.todo-form-add').hide();
+						$('.todo-input-add').val('');
+					});
+
+					$(document).off('click', '.todo-save').on('click', '.todo-save', function(e){
+						e.preventDefault();
+						var value = $('.todo-input-add').val();
+						todo.addItem(value).success(function(){
+		                    	$('.todo-input-add').val('');	
+		                    });;
+					});
+
+					$(document).off('click', '.todo-delete').on('click', '.todo-delete', function(e){
+						e.preventDefault();
+						var id = $(this).data('id');
+						todo.deleteItem(id);
+					});
+
+					$(document).off('change', '.todo-checkbox').on('change', '.todo-checkbox', function(e){
+						e.preventDefault();
+						var id = $(this).data('id'),
+							checked = $(this).is(':checked');
+						todo.checkItem(id, checked);
+					});
+				});
+			}
+			  function signOut() {
+			    var auth2 = gapi.auth2.getAuthInstance();
+			    auth2.signOut().then(function () {
+			      console.log('User signed out.');
+			      $('.todo-container').empty();
+			      $('.todo-signout').hide();
+			      $('body').removeClass('initialized');
+			    });
+			  }
+		</script>		
+	</head>
+	<body>
+		<div class="todo-auth">
+			<div class="g-signin2" data-onsuccess="onSignIn" data-theme="dark"></div>
+			<a href="#" class="todo-signout" style="display:none;" onclick="signOut();">Sign out</a>
+		</div>
+		<div class="todo-container">
+		</div>
+	</body>
+</html>
